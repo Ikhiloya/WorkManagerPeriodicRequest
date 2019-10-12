@@ -57,33 +57,41 @@ public abstract class NetworkBoundResource<ResultType, RequestType> {
     private void fetchFromNetwork(final LiveData<ResultType> dbSource) {
         LiveData<ApiResponse<RequestType>> apiResponse = createCall();
         // we re-attach dbSource as a new source, it will dispatch its latest value quickly
-        result.addSource(dbSource, newData -> setValue(Resource.loading(newData)));
+        result.addSource(dbSource, new Observer<ResultType>() {
+            @Override
+            public void onChanged(ResultType newData) {
+                NetworkBoundResource.this.setValue(Resource.loading(newData));
+            }
+        });
         // adding a data source form the network, this takes time
-        result.addSource(apiResponse, response -> {
-            result.removeSource(apiResponse);
-            result.removeSource(dbSource); // removes the existing data sources since we've gotten a response from the network call
-            //noinspection ConstantConditions
-            if (response.isSuccessful()) {
-                appExecutors.diskIO().execute(() -> {
-                    //saves the result/data from network to db, so the db has an updated data
-                    //this is done in a background thread
-                    NetworkBoundResource.this.saveCallResult(NetworkBoundResource.this.processResponse(response));
-                    appExecutors.mainThread().execute(() ->
-                                    // we specially request a new live data,
-                                    // otherwise we will get immediately last cached value,
-                                    // which may not be updated with latest results received from network.
-                            {
-                                result.addSource(NetworkBoundResource.this.loadFromDb(), // -> latest data from the network used to update any calling activity, single source of truth
-                                        (ResultType newData) -> {
-                                            NetworkBoundResource.this.setValue(Resource.success(newData));
-                                        });
-                            }
-                    );
-                });
-            } else {
-                NetworkBoundResource.this.onFetchFailed();
-                result.addSource(dbSource,
-                        newData -> NetworkBoundResource.this.setValue(Resource.error(response.errorMessage, newData)));
+        result.addSource(apiResponse, new Observer<ApiResponse<RequestType>>() {
+            @Override
+            public void onChanged(ApiResponse<RequestType> response) {
+                result.removeSource(apiResponse);
+                result.removeSource(dbSource); // removes the existing data sources since we've gotten a response from the network call
+                //noinspection ConstantConditions
+                if (response.isSuccessful()) {
+                    appExecutors.diskIO().execute(() -> {
+                        //saves the result/data from network to db, so the db has an updated data
+                        //this is done in a background thread
+                        NetworkBoundResource.this.saveCallResult(NetworkBoundResource.this.processResponse(response));
+                        appExecutors.mainThread().execute(() ->
+                                        // we specially request a new live data,
+                                        // otherwise we will get immediately last cached value,
+                                        // which may not be updated with latest results received from network.
+                                {
+                                    result.addSource(NetworkBoundResource.this.loadFromDb(), // -> latest data from the network used to update any calling activity, single source of truth
+                                            (ResultType newData) -> {
+                                                NetworkBoundResource.this.setValue(Resource.success(newData));
+                                            });
+                                }
+                        );
+                    });
+                } else {
+                    NetworkBoundResource.this.onFetchFailed();
+                    result.addSource(dbSource,
+                            newData -> NetworkBoundResource.this.setValue(Resource.error(response.errorMessage, newData)));
+                }
             }
         });
     }

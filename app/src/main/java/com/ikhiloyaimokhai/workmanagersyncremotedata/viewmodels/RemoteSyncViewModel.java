@@ -44,6 +44,10 @@ public class RemoteSyncViewModel extends AndroidViewModel {
         return mRepository.loadBooks();
     }
 
+    public LiveData<Resource<List<Book>>> loadNewBooks() {
+        return mRepository.loadNewBooks();
+    }
+
     public void fetchData() {
 
         // Create Network constraint

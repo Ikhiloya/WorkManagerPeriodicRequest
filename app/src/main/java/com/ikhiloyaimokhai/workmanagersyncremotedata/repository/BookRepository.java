@@ -16,6 +16,7 @@ import com.ikhiloyaimokhai.workmanagersyncremotedata.service.BookService;
 import com.ikhiloyaimokhai.workmanagersyncremotedata.util.AppExecutors;
 import com.ikhiloyaimokhai.workmanagersyncremotedata.util.NetworkBoundResource;
 import com.ikhiloyaimokhai.workmanagersyncremotedata.util.Resource;
+import com.ikhiloyaimokhai.workmanagersyncremotedata.util.NetworkBoundResourceWithoutRoom;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class BookRepository {
     }
 
 
-    public LiveData<List<Book>> getBooks(){
+    public LiveData<List<Book>> getBooks() {
         return mBookDao.getBooks();
     }
 
@@ -86,6 +87,18 @@ public class BookRepository {
             }
         }.asLiveData();
     }
+
+
+    public LiveData<Resource<List<Book>>> loadNewBooks() {
+        return new NetworkBoundResourceWithoutRoom<List<Book>>() {
+            @NonNull
+            @Override
+            protected LiveData<ApiResponse<List<Book>>> createCall() {
+                return bookService.getBooks();
+            }
+        }.asLiveData();
+    }
+
 
     public android.app.Application getApplication() {
         return application;

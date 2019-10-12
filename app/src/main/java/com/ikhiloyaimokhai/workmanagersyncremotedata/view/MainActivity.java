@@ -18,7 +18,7 @@ import com.ikhiloyaimokhai.workmanagersyncremotedata.factory.ViewModelFactory;
 import com.ikhiloyaimokhai.workmanagersyncremotedata.repository.BookRepository;
 import com.ikhiloyaimokhai.workmanagersyncremotedata.service.BookService;
 import com.ikhiloyaimokhai.workmanagersyncremotedata.util.AppExecutors;
-import com.ikhiloyaimokhai.workmanagersyncremotedata.viewmodels.RemoteSyncViewModel;
+import com.ikhiloyaimokhai.workmanagersyncremotedata.viewmodels.RemoteSyncViewModel ;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         BookRepository mRepository = new BookRepository(getApplication(), MainActivity.this, bookService, new AppExecutors());
         ViewModelFactory factory = new ViewModelFactory(mRepository);
         mRemoteSyncViewModel = ViewModelProviders.of(this, factory).get(RemoteSyncViewModel.class);
-
 
         mRemoteSyncViewModel.fetchData();
 

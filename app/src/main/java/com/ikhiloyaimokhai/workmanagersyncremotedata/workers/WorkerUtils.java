@@ -22,7 +22,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -36,6 +35,8 @@ import com.ikhiloyaimokhai.workmanagersyncremotedata.view.MainActivity;
 
 import java.lang.reflect.Type;
 import java.util.List;
+
+import timber.log.Timber;
 
 import static com.ikhiloyaimokhai.workmanagersyncremotedata.util.Constants.CHANNEL_ID;
 import static com.ikhiloyaimokhai.workmanagersyncremotedata.util.Constants.DELAY_TIME_MILLIS;
@@ -105,7 +106,7 @@ public final class WorkerUtils {
         try {
             Thread.sleep(DELAY_TIME_MILLIS, 0);
         } catch (InterruptedException e) {
-            Log.d(TAG, e.getMessage());
+            Timber.d(e.getMessage());
         }
     }
 
