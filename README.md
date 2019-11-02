@@ -7,12 +7,12 @@ _ _ _
 
 - - -
 ### This project contains the following: 
-##### WorkManager
-##### Model View ViewModel (MVVM) Architecture
-##### Android Room Database
-##### ViewModel
-##### Retrofit
-##### LiveData
-##### Notification
+- WorkManager
+- Model View ViewModel (MVVM) Architecture
+- Android Room Database
+- ViewModel
+- Retrofit
+- LiveData
+- Notification
 
 
